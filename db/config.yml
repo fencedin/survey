@@ -1,0 +1,7 @@
+development:
+  adapter: postgresql
+  database: questionaire_dev
+
+test:
+  adapter: postgresql
+  database: questionaire_test
