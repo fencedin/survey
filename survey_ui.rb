@@ -4,6 +4,8 @@ require 'pry'
 require './lib/survey'
 require './lib/question'
 require './lib/response'
+require './lib/q_s'
+require './lib/q_r'
 
 ActiveRecord::Base.establish_connection(YAML::load(File.open('./db/config.yml'))['development'])
 
@@ -84,22 +86,22 @@ def list_survey
   puts "=============================="
 end
 
-def view_survey
-  puts "Enter name of survey you wish to view:"
-  edit_choice = gets.chomp
-  survey =  Survey.where({name: edit_choice}).first
-  clear
-  puts survey.name
-  puts "=============================================================================="
-  survey.questions.each do |q|
-    puts "\t" + q.description
-    q.responses.each do |r|
-      puts "\t\t" + r.answer
-    end
-  end
-  gets.chomp
-  clear
-end
+# def view_survey
+#   puts "Enter name of survey you wish to view:"
+#   edit_choice = gets.chomp
+#   survey =  Survey.where({name: edit_choice}).first
+#   clear
+#   puts survey.name
+#   puts "=============================================================================="
+#   survey.questions.each do |q|
+#     puts "\t" + q.description
+#     q.responses.each do |r|
+#       puts "\t\t" + r.answer
+#     end
+#   end
+#   gets.chomp
+#   clear
+# end
 
 def add_survey
   puts "Name the survey:"
@@ -148,9 +150,12 @@ def show_survey_qs(survey)
   puts "\n\nAvailable questions to add:"
   puts "==========================================================================================================="
   puts "description                                                                                          id"
-  al_qs = Question.where({survey_id: nil})
-  qs_left = al_qs - survey.questions
-  qs_left.each {|qs| puts "  " + qs.description + " "*(100-qs.description.length) + qs.id.to_s}
+
+
+  all_qs = Question.all - Qsurvey.where.not({survey_id: survey.id}) #LEFT OFF HERE!!!
+
+
+  all_qs.each {|qs| puts "  " + qs.description + " "*(100-qs.description.length) + qs.id.to_s}
 end
 
 def edit_survey_qs(survey)
@@ -174,7 +179,7 @@ def add_q_to_s(survey)
   puts "Enter id of question you would like to add"
   add_q_id = gets.chomp
   q = Question.where({id: add_q_id}).first
-  q.update({survey_id: survey.id})
+  Qsurvey.create({survey_id: survey.id, question_id: q.id})
   clear
   edit_survey_qs(survey)
 end
@@ -182,8 +187,8 @@ end
 def remove_q_from_s(survey)
   puts "Enter id of question you would like to remove"
   rm_q_id = gets.chomp
-  q = Question.where({id: rm_q_id}).first
-  q.update({survey_id: nil})
+  q = Qsurvey.where({survey_id: survey.id, question_id: rm_q_id}).first
+  q.destroy
   clear
   edit_survey_qs(survey)
 end

@@ -5,6 +5,8 @@ require 'shoulda-matchers'
 require './lib/survey'
 require './lib/question'
 require './lib/response'
+require './lib/q_r'
+require './lib/q_s'
 
 ActiveRecord::Base.establish_connection(YAML::load(File.open('./db/config.yml'))['test'])
 

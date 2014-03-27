@@ -4,7 +4,7 @@ class Survey < ActiveRecord::Base
                    length: 3..50,
                    uniqueness: true
 
-  has_many :questions
-
+  has_many :qsurveys
+  has_many :questions, through: :qsurveys
 
 end
